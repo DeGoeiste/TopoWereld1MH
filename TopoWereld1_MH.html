@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>TopoWereld1 MH</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f8ff; margin: 0; padding: 0; }
+    h1 { margin-top: 20px; }
+    .container {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    img {
+      width: 100%;
+      max-width: 1000px;
+      height: auto;
+      margin: 0 auto;
+      display: block;
+    }
+    #quiz-box {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      width: 300px;
+      padding: 15px;
+      z-index: 10;
+    }
+    input[type="text"] {
+      width: 90%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px auto;
+      border: none;
+      border-radius: 5px;
+      background-color: #007acc;
+      color: white;
+      cursor: pointer;
+    }
+    #feedback {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #score {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TopoWereld1 MH</h1>
+  <div class="container">
+    <div id="quiz-box">
+      <h2>Welk land hoort bij nummer <span id="vraag-nummer"></span>?</h2>
+      <input type="text" id="land" placeholder="Land"><br>
+      <button onclick="controleerAntwoord()">Controleer</button>
+      <div id="feedback"></div>
+    </div>
+    <img src="wereldkaart landen hoofdsteden.jpg" alt="Wereldkaart">
+  </div>
+  <div id="score"></div>
+
+  <script>
+    const antwoorden = {
+      1: "Canada",
+      2: "Verenigde Staten",
+      3: "Mexico",
+      4: "Venezuela",
+      5: ["Colombia", "Bogota"],
+      6: "Brazilië",
+      7: "Peru",
+      8: "Bolivia",
+      9: "Chili",
+      10: "Argentinië",
+      11: "Marokko",
+      12: "Algerije",
+      13: "Tunesië",
+      14: "Libië",
+      15: "Egypte",
+      16: "Mauritanië",
+      17: "Mali",
+      18: "Niger",
+      19: "Tsjaad",
+      20: "Sudan",
+      21: "Zuid-Sudan",
+      22: "Ethiopië",
+      23: "Nigeria",
+      24: "Democratische Republiek Congo",
+      25: "Kenia",
+      26: "Tanzania",
+      27: "Angola",
+      28: "Mozambique",
+      29: "Zuid-Afrika",
+      30: "Turkije",
+      31: "Israël",
+      32: "Syrië",
+      33: "Jordanië",
+      34: "Irak",
+      35: "Iran",
+      36: "Saudi-Arabië",
+      37: "Rusland",
+      38: "Oekraïne",
+      39: "Kazachstan",
+      40: "Afghanistan",
+      41: "Pakistan",
+      42: "India",
+      43: "Myanmar",
+      44: "Thailand",
+      45: "Indonesië",
+      46: "Vietnam",
+      47: "Filipijnen",
+      48: "China",
+      49: "Japan",
+      50: "Australië",
+      51: "Nieuw-Zeeland"
+    };
+
+    let scoreGoed = 0;
+    let scoreFout = 0;
+    let huidigeNummer = 0;
+    let nummersOver = [...Array(51).keys()].map(i => i + 1);
+    let tweedeKans = false;
+
+    function normalize(text) {
+      return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    }
+
+    function volgendeVraag() {
+      if (nummersOver.length === 0) {
+        document.getElementById("quiz-box").innerHTML = "<h2>Quiz voltooid!</h2><p>Score: " + scoreGoed + " goed, " + scoreFout + " fout.</p>";
+        return;
+      }
+      const index = Math.floor(Math.random() * nummersOver.length);
+      huidigeNummer = nummersOver.splice(index, 1)[0];
+      document.getElementById("vraag-nummer").textContent = huidigeNummer;
+      document.getElementById("land").value = "";
+      document.getElementById("quiz-box").style.display = "block";
+      document.getElementById("feedback").textContent = "";
+      tweedeKans = false;
+
+      if ([1, 2, 3].includes(huidigeNummer)) {
+        document.getElementById("quiz-box").style.left = "auto";
+        document.getElementById("quiz-box").style.right = "10px";
+      } else {
+        document.getElementById("quiz-box").style.right = "auto";
+        document.getElementById("quiz-box").style.left = "10px";
+      }
+    }
+
+    function controleerAntwoord() {
+      const landInput = normalize(document.getElementById("land").value.trim());
+      const correct = antwoorden[huidigeNummer];
+      const juisteLand = Array.isArray(correct) ? correct.map(normalize) : [normalize(correct)];
+
+      if (juisteLand.includes(landInput)) {
+        scoreGoed++;
+        document.getElementById("feedback").textContent = "✅ Correct!";
+        document.getElementById("score").innerHTML = `Score: ${scoreGoed} goed, ${scoreFout} fout.`;
+        setTimeout(volgendeVraag, 1000);
+      } else if (!tweedeKans) {
+        tweedeKans = true;
+        document.getElementById("land").value = "";
+        document.getElementById("feedback").textContent = "❌ Niet correct, probeer het nog eens.";
+      } else {
+        scoreFout++;
+        document.getElementById("feedback").textContent = `❌ Fout. Juist antwoord: ${Array.isArray(correct) ? correct[0] : correct}`;
+        document.getElementById("score").innerHTML = `Score: ${scoreGoed} goed, ${scoreFout} fout.`;
+        setTimeout(volgendeVraag, 2000);
+      }
+    }
+
+    window.onload = volgendeVraag;
+  </script>
+</body>
+</html>
